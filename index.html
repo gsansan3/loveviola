@@ -4,8 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta property="og:title" content="運命の弦楽器診断">
-  <meta property="og:image" content="https://gsansan33.github.io/loveviola/thumbnail.jpg">
-  <meta name="twitter:card" content="summary_large_image">
+<meta property="og:description" content="質問に答えていくと、あなたに最適な楽器が判定されます。（※最新のAIを活用して作成したため、極めて客観的かつ正確な判定が得られます！たぶん）">
+<meta property="og:image" content="https://gsansan33.github.io/loveviola/thumbnail.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <title>運命の弦楽器診断</title>
 <style>
   body {
@@ -52,7 +53,6 @@
     text-align: left;
     transition: 0.2s;
   }
-  /* マウスが使える環境（PCなど）でのみホバーを有効にする */
   @media (hover: hover) and (pointer: fine) {
     button:hover {
       background: #fff;
@@ -74,7 +74,7 @@
     line-height: 1.4;
     color: #fff;
   }
-  /* 見出しと本文の余白を詰める設定 */
+  /* 小見出し（黄色） */
   .reason-item {
     font-weight: bold;
     color: #ffeb3b;
@@ -93,7 +93,6 @@
   .reason-text:last-child {
     margin-bottom: 0;
   }
-  /* 画像配置用のスタイリング */
   .result-img-container {
     text-align: center;
     margin: 10px 0;
@@ -106,27 +105,13 @@
     border-radius: 4px;
     box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
   }
-  .img-caption {
-    font-size: 11px;
-    color: #aaa;
-    margin-top: 4px;
-  }
 
-  /* 脈動アニメーションの定義 */
   @keyframes pulse {
-    0% {
-      transform: scale(1);
-    }
-    50% {
-      transform: scale(1.08);
-      box-shadow: 0 0 15px rgba(255, 0, 127, 0.6);
-    }
-    100% {
-      transform: scale(1);
-    }
+    0% { transform: scale(1); }
+    50% { transform: scale(1.08); box-shadow: 0 0 15px rgba(255, 0, 127, 0.6); }
+    100% { transform: scale(1); }
   }
 
-  /* 【ヴィオラ（Viola）】専用グラデーション＆脈動スタイル */
   .perfect-viola-title {
     background: linear-gradient(45deg, #ff007f, #7f00ff);
     color: #fff;
@@ -138,23 +123,38 @@
     animation: pulse 1.8s infinite ease-in-out;
   }
 
-  /* 完全選択時の締めテキストピンク色指定 */
-  .perfect-viola-text {
+  /* ひと昔前の個人ホームページ風ダサアニメーション＆配色 */
+  @keyframes tacky-blink {
+    0% { color: #00ff00; background-color: #ff00ff; }
+    50% { color: #ffff00; background-color: #0000ff; }
+    100% { color: #00ff00; background-color: #ff00ff; }
+  }
+
+  .highlight-ai-retro {
+    font-weight: bold;
+    font-size: 1.1em;
+    padding: 2px 4px;
+    border: 2px outset #ffffff;
+    animation: tacky-blink 0.6s infinite;
+  }
+
+  /* 理由テキスト内の強調カラー（ピンク） */
+  .hl-pink {
     color: #ff69b4;
+    font-weight: bold;
   }
 </style>
 </head>
 <body>
 
 <div class="window">
-  <div id="text-box" class="text-box">「運命の弦楽器診断」へようこそ！<br>３つの質問に答えて、あなたにぴったりの弦楽器を見つけてみましょう。</div>
+  <div id="text-box" class="text-box">「運命の弦楽器診断」へようこそ！<br><span class="highlight-ai-retro">最新のAI</span> が３つの質問から、あなたにぴったりの弦楽器を割り出します。</div>
   <div id="options" class="options">
     <!-- ボタンが動的に入ります -->
   </div>
 </div>
 
 <script>
-// Web Audio API を使った効果音の生成
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 function playBeepSound() {
@@ -177,7 +177,6 @@ function playBeepSound() {
   osc.stop(audioCtx.currentTime + 0.08);
 }
 
-// 質問データ（第3問の選択肢を3つに削減・IDを再調整）
 const quizData = [
   {
     question: "【第１問】舞台の上での あなたが 心惹かれる アプローチは？",
@@ -205,19 +204,18 @@ const quizData = [
   }
 ];
 
-// こじつけ理由（第3問のID変更に合わせて調整）
 const reasons = {
-  q1_1: "【アプローチ】\n物語の先頭を駆け抜けたいあなた：主旋律を歌い上げるのに最もふさわしい楽器こそがヴィオラです。人の声に最も近い温かく深い音色で主旋律を伸びやかに奏で、時に合奏全体を包み込みながら主役を張る表現力は、あなたの求める役割に完璧に合致しています。",
-  q1_2: "【アプローチ】\n土台となって空間を満たしたいあなた：ヴィオラの最低音（Ｃ線）が持つ深みのある響きこそ、アンサンブルの土台を根底から支える鍵となります。全体のバランスを察知するあなたの感性に最適です。",
-  q1_3: "【アプローチ】\n豊かな陰影をつくりたいあなた：ハーモニーの隙間を埋め、旋律と伴奏を結ぶ美学を理解しているあなたは、まさに天性のヴィオラ適性を持っています。",
+  q1_1: "【アプローチ】\n物語の先頭を駆け抜けたいあなた：<span class=\"hl-pink\">主旋律を歌い上げるのに最もふさわしい楽器こそがヴィオラ</span>です。人の声に最も近い温かく深い音色で主旋律を伸びやかに奏で、時に合奏全体を包み込みながら主役を張る表現力は、あなたの求める役割に完璧に合致しています。",
+  q1_2: "【アプローチ】\n土台となって空間を満たしたいあなた：ヴィオラの最低音（Ｃ線）が持つ深みのある響きこそ、<span class=\"hl-pink\">アンサンブルの土台を根底から支える鍵</span>となります。全体のバランスを察知するあなたの感性に最適です。",
+  q1_3: "【アプローチ】\n豊かな陰影をつくりたいあなた：ハーモニーの隙間を埋め、旋律と伴奏を結ぶ美学を理解しているあなたは、まさに<span class=\"hl-pink\">天性のヴィオラ適性</span>を持っています。",
 
-  q2_1: "【風景】\n高く澄み渡った空間を思い描くあなた：ヴィオラは高音域で見せる表情豊かな旋律美も持ち合わせています。澄み切った高音ソロも美しく歌い上げられる表現力は、あなたのセンスそのものです。",
-  q2_2: "【風景】\n重厚な世界を思い描くあなた：音の深みを鋭く捉えるセンスをお持ちです。ヴィオラ独特の渋く豊かな中低音域を的確に表現し、空間の広がりを作り出すことができます。",
-  q2_3: "【風景】\n温かみと哀愁のある中間世界を思い描くあなた：中心となる音響空間を直感的に捉えられる感性をお持ちです。ヴィオラ奏者としてこれ以上ない資質と言えます。",
+  q2_1: "【風景】\n高く澄み渡った空間を思い描くあなた：ヴィオラは高音域で見せる表情豊かな旋律美も持ち合わせています。<span class=\"hl-pink\">澄み切った高音ソロも美しく歌い上げられる表現力</span>は、あなたのセンスそのものです。",
+  q2_2: "【風景】\n重厚な世界を思い描くあなた：音の深みを鋭く捉えるセンスをお持ちです。ヴィオラ独特の渋く豊かな中低音域を的確に表現し、<span class=\"hl-pink\">空間の広がりを作り出す</span>ことができます。",
+  q2_3: "【風景】\n温かみと哀愁のある中間世界を思い描くあなた：中心となる音響空間を直感的に捉えられる感性をお持ちです。<span class=\"hl-pink\">ヴィオラ奏者としてこれ以上ない資質</span>と言えます。",
 
-  q3_1: "【欲求】\n哀愁と情熱を求めるあなた：弦楽器の中で最も人声に近く、渋く深い哀愁を表現できるのがヴィオラです。あなたの求める豊かな情熱を余すことなく表現できます。",
-  q3_2: "【欲求】\n重厚な低音を求めるあなた：ヴィオラ独特の味わい深い低音は、他の楽器にはない唯一無二の深みを持っています。音の奥行きを追求するあなたにふさわしい選択です。",
-  q3_3: "【欲求】\n渋い存在感を求めるあなた：聴く者の心を揺さぶる渋い響きと、合奏の骨格を担う揺るぎない存在感。知る人ぞ知るヴィオラ本来のコアな魅力と、あなたの卓越した美意識が完全に見合っています。"
+  q3_1: "【欲求】\n哀愁と情熱を求めるあなた：弦楽器の中で最も人声に近く、<span class=\"hl-pink\">渋く深い哀愁を表現できるのがヴィオラ</span>です。あなたの求める豊かな情熱を余すことなく表現できます。",
+  q3_2: "【欲求】\n重厚な低音を求めるあなた：ヴィオラ独特の味わい深い低音は、他の楽器にはない<span class=\"hl-pink\">唯一無二の深み</span>を持っています。音の奥行きを追求するあなたにふさわしい選択です。",
+  q3_3: "【欲求】\n渋い存在感を求めるあなた：聴く者の心を揺さぶる渋い響きと、合奏の骨格を担う揺るぎない存在感。知る人ぞ知る<span class=\"hl-pink\">ヴィオラ本来のコアな魅力</span>と、あなたの卓越した美意識が完全に見合っています。"
 };
 
 let userChoices = [];
@@ -265,24 +263,14 @@ function showResult() {
     return `<div class="reason-item">・${title}</div><div class="reason-text">${body}</div>`;
   }
 
-  // 完全なヴィオラ選択肢（第１問:３, 第２問:３, 第３問:３）の判定
-  const isPerfectViola = (userChoices[0] === "q1_3" && userChoices[1] === "q2_3" && userChoices[2] === "q3_3");
-
   const imageUrl = "my_viola.jpg"; 
-
-  // タイトルはグラデーション＆脈動スタイルで共通適用
   const instrumentTitleHtml = `<div style="text-align: center; margin: 8px 0;"><span class="perfect-viola-title">【ヴィオラ（Viola）】</span></div>`;
 
-  // 締めの文章（完全一致時のみピンク色のスパン要素で囲む）
-  const closingText = isPerfectViola
-    ? `<span class="perfect-viola-text">驚異的です！ あなたの内面にある音楽的資質や美意識のすべてが、完全にヴィオラの領域と共鳴しています！！ さあ、迷わず今すぐアルト記号の楽譜を開きましょう！！！</span>`
-    : `あなたの内面にある音楽的資質や好みが、すべてヴィオラの特性と見事に合致しています！ さあ、今すぐアルト記号の楽譜を開きましょう！`;
-
+const closingText = `判定結果はいかがでしたか？<br>今回の判定は、<span class="highlight-ai-retro">最新AI</span>の厳正な診断結果です。信じてください。本当にAIがそう言ってるんです。<br><br>ほら、あなたの心は、すでにヴィオラを求めているはずです。今すぐヴィオラを弾き始めてください`;
   textBox.innerHTML = `<div class="result-title">🏆 診断結果</div>` +
 instrumentTitleHtml +
-`<div class="result-img-container"><img src="${imageUrl}" alt="ヴィオラ" class="result-img"><div class="img-caption">※制作者の愛器</div></div>` +
+`<div class="result-img-container"><img src="${imageUrl}" alt="ヴィオラ" class="result-img"></div>` +
 `分析完了！ あなたの回答を総合的に検証した結果、あなたに最もふさわしい楽器は<b>【ヴィオラ】</b>であると判定されました！<br>` +
-`<b>【診断の根拠】</b>` +
 `<div class="reason-box">${formatReason(reason1)}${formatReason(reason2)}${formatReason(reason3)}</div>` +
 closingText;
 
